@@ -1,0 +1,6 @@
+framework module Pods_RxFeedbackExamble {
+  umbrella header "Pods-RxFeedbackExamble-umbrella.h"
+
+  export *
+  module * { export * }
+}
