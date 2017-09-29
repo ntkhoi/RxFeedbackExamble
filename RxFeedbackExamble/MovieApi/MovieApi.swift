@@ -22,6 +22,8 @@ enum CommonError : Error {
 typealias JsonObject = [String: Any]
 typealias MovieResponse = Driver<Result<[Movie]>>
 
+
+
 struct NetworkingLayer {
     static func fetchRepositories(page: Int = 1) -> MovieResponse {
         return requestJSON(.get, "https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed&page=\(page)").debug()
@@ -50,6 +52,5 @@ struct NetworkingLayer {
             })
             .asDriver(onErrorJustReturn: .failure(CommonError.parsingError))
     }
-    
 }
 

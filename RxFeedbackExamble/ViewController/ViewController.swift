@@ -18,7 +18,9 @@ extension UIScrollView {
 }
 
 class ViewController: UIViewController, UITableViewDelegate  {
+
     private var disposeBag = DisposeBag()
+    private var refeshcontrol: UIRefreshControl?
     let dataSource = RxTableViewSectionedReloadDataSource<SectionModel<String, Movie>>()
     
     @IBOutlet weak var tableView: UITableView! {
@@ -30,7 +32,17 @@ class ViewController: UIViewController, UITableViewDelegate  {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        //----------------------------------------------------------------//
+        //----------------------Setup UI----------------------------------//
         let tableView: UITableView = self.tableView
+        refeshcontrol = UIRefreshControl()
+        tableView.insertSubview(refeshcontrol!, at: 0)
+        
+        //----------------------------------------------------------------//
+
+        
+        
+        
         let loadNextPageTrigger: (Observable<MovieState>) -> Observable<()> =  { state in
             tableView.rx.contentOffset.asObservable()
                 .withLatestFrom(state)
@@ -41,7 +53,21 @@ class ViewController: UIViewController, UITableViewDelegate  {
             }
         }
         
-        let state = loadMovieState(loadNextPageTrigger: loadNextPageTrigger)
+        let pullToRequestTrigger: () -> Observable<()> = { [unowned self]  in
+            self.refeshcontrol!.rx.controlEvent(.valueChanged)
+                .asObservable()
+                .observeOn(MainScheduler.instance)
+                
+        }
+        
+        let state = loadMovieState(
+            loadNextPageTrigger: loadNextPageTrigger ,
+            pullToRequestTrigger: pullToRequestTrigger
+        )
+        
+        state.map{ $0.isPullRefreshing }
+        .bind(to: refeshcontrol!.rx.isRefreshing)
+        .addDisposableTo(disposeBag)
         
         dataSource.configureCell = { (_, tv, ip, movie: Movie) in
             let cell = tv.dequeueReusableCell(withIdentifier: String(describing: MovieCell.self))! as! MovieCell

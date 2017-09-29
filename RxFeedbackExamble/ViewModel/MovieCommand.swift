@@ -11,4 +11,5 @@ import Alamofire
 enum MovieCommand {
     case movieResponseRecieved(Result<[Movie]>)
     case loadMoreItems
+    case pullToRequest
 }
