@@ -18,7 +18,6 @@
 		DA8407A11F7A39FA00227C19 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA8407A01F7A39FA00227C19 /* Version.swift */; };
 		DA8407A31F7A3ECF00227C19 /* Lenses.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA8407A21F7A3ECF00227C19 /* Lenses.swift */; };
 		DAD2408A1F7A2E3200FD32D2 /* Movie.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD240891F7A2E3200FD32D2 /* Movie.swift */; };
-		DAD2408D1F7A2F1000FD32D2 /* MovieViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD2408C1F7A2F1000FD32D2 /* MovieViewModel.swift */; };
 		DAD2408F1F7A2F3F00FD32D2 /* MovieCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD2408E1F7A2F3F00FD32D2 /* MovieCommand.swift */; };
 		DAD240911F7A305E00FD32D2 /* MoviesState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD240901F7A305E00FD32D2 /* MoviesState.swift */; };
 /* End PBXBuildFile section */
@@ -39,7 +38,6 @@
 		DA8407A01F7A39FA00227C19 /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
 		DA8407A21F7A3ECF00227C19 /* Lenses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lenses.swift; sourceTree = "<group>"; };
 		DAD240891F7A2E3200FD32D2 /* Movie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Movie.swift; sourceTree = "<group>"; };
-		DAD2408C1F7A2F1000FD32D2 /* MovieViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieViewModel.swift; sourceTree = "<group>"; };
 		DAD2408E1F7A2F3F00FD32D2 /* MovieCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieCommand.swift; sourceTree = "<group>"; };
 		DAD240901F7A305E00FD32D2 /* MoviesState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviesState.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -145,7 +143,6 @@
 		DAD2408B1F7A2EF300FD32D2 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				DAD2408C1F7A2F1000FD32D2 /* MovieViewModel.swift */,
 				DAD2408E1F7A2F3F00FD32D2 /* MovieCommand.swift */,
 				DAD240901F7A305E00FD32D2 /* MoviesState.swift */,
 			);
@@ -256,6 +253,7 @@
 				"${BUILT_PRODUCTS_DIR}/RxFeedback/RxFeedback.framework",
 				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
+				"${BUILT_PRODUCTS_DIR}/SVProgressHUD/SVProgressHUD.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -267,6 +265,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxFeedback.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SVProgressHUD.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -298,7 +297,6 @@
 				DAD240911F7A305E00FD32D2 /* MoviesState.swift in Sources */,
 				DAD2408F1F7A2F3F00FD32D2 /* MovieCommand.swift in Sources */,
 				DA809C591F7A065B001051D3 /* ViewController.swift in Sources */,
-				DAD2408D1F7A2F1000FD32D2 /* MovieViewModel.swift in Sources */,
 				DA8407A31F7A3ECF00227C19 /* Lenses.swift in Sources */,
 				DA809C6B1F7A0A94001051D3 /* MovieApi.swift in Sources */,
 				DAD2408A1F7A2E3200FD32D2 /* Movie.swift in Sources */,

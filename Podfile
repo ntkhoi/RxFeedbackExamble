@@ -9,7 +9,7 @@ target 'RxFeedbackExamble' do
   pod "RxFeedback"
   pod 'RxDataSources', '~> 1.0'
   pod 'SDWebImage', '~> 4.0'
-  # Pods for RxFeedbackExamble
+  pod 'SVProgressHUD'
   
   
   post_install do |installer|

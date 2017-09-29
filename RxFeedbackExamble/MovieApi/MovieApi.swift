@@ -47,9 +47,6 @@ struct NetworkingLayer {
                 }
             }
             .observeOn(MainScheduler.instance) // switch to MainScheduler, UI updates
-            .do(onNext: { _ in
-                UIApplication.shared.isNetworkActivityIndicatorVisible = false
-            })
             .asDriver(onErrorJustReturn: .failure(CommonError.parsingError))
     }
 }
