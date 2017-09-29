@@ -10,4 +10,5 @@ import Foundation
 import Alamofire
 enum MovieCommand {
     case movieResponseRecieved(Result<[Movie]>)
+    case loadMoreItems
 }
