@@ -18,8 +18,7 @@ extension UIScrollView {
 }
 
 class ViewController: UIViewController, UITableViewDelegate  {
-    var disposeBag = DisposeBag()
-   
+    private var disposeBag = DisposeBag()
     let dataSource = RxTableViewSectionedReloadDataSource<SectionModel<String, Movie>>()
     
     @IBOutlet weak var tableView: UITableView! {
