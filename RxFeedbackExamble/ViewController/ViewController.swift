@@ -10,6 +10,7 @@ import UIKit
 import RxSwift
 import RxCocoa
 import RxDataSources
+import SVProgressHUD
 
 extension UIScrollView {
     func  isNearBottomEdge(edgeOffset: CGFloat = 20.0) -> Bool {
@@ -21,7 +22,7 @@ class ViewController: UIViewController, UITableViewDelegate  {
 
     private var disposeBag = DisposeBag()
     private var refeshcontrol: UIRefreshControl?
-    var state: Observable<MovieState>?
+    private var _state: Observable<MovieState>?
     let dataSource = RxTableViewSectionedReloadDataSource<SectionModel<String, Movie>>()
     
     @IBOutlet weak var tableView: UITableView! {
@@ -53,17 +54,27 @@ class ViewController: UIViewController, UITableViewDelegate  {
         
         let pullToRequestTrigger: () -> Observable<()> = { [unowned self]  in
             self.refeshcontrol!.rx.controlEvent(.valueChanged)
-                .asObservable()
-                .observeOn(MainScheduler.instance)
+            .asObservable()
         }
         
-        state = loadMovieState(
+        _state = loadMovieState(
             loadNextPageTrigger: loadNextPageTrigger ,
             pullToRequestTrigger: pullToRequestTrigger
-        )
+        ).shareReplay(1)
+        
         configCell()
         configDatasource()
         bindingIsRefeshing()
+        
+        _state!.map{ $0.isLoading }
+            .subscribe(onNext: { (isloading) in
+                if isloading {
+                    SVProgressHUD.show()
+                } else {
+                    SVProgressHUD.dismiss()
+                }
+            }).addDisposableTo(disposeBag)
+        
         
         tableView.rx.modelSelected(Movie.self)
             .subscribe(onNext: { movie in
@@ -81,15 +92,16 @@ class ViewController: UIViewController, UITableViewDelegate  {
     }
     
     fileprivate func configDatasource() {
-        state!
+        _state!
             .map { $0.movies }
             .distinctUntilChanged()
             .map { [SectionModel(model: "Movies", items: $0.value)] }
             .bind(to:tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
     }
+    
     fileprivate func bindingIsRefeshing() {
-        state!.map{ $0.isPullRefreshing }
+        _state!.map{ $0.isPullRefreshing }
             .bind(to: refeshcontrol!.rx.isRefreshing)
             .addDisposableTo(disposeBag)
     }

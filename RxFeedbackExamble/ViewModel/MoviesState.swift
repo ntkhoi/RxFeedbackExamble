@@ -11,16 +11,19 @@ struct MovieState {
     var movies: Version<[Movie]> // Version is an optimization. When something unrelated changes, we don't want to
     var page: Int
     var shouldLoadNextPage: Bool
-    var isPullRefreshing: Bool    
+    var isPullRefreshing: Bool
+    var isLoading: Bool
     init() {
         movies = Version([])
         page = 1
         shouldLoadNextPage = true
         isPullRefreshing = false
+        isLoading = true
     }
 }
 extension MovieState {
-    static let initial = MovieState()
+    
+    static var initial = MovieState()
     static func reduce(state: MovieState,command: MovieCommand) -> MovieState {
         switch command {
         case .movieResponseRecieved(let movieResponse):
@@ -28,24 +31,38 @@ extension MovieState {
             case .success(let movies):
                 return state.mutate {
                     $0.movies = Version(state.movies.value + movies )
-                    $0.shouldLoadNextPage = false
+                    $0.shouldLoadNextPage = true
                     $0.isPullRefreshing = false
+                    $0.isLoading = false
                     return
                 }
             case .failure(_):
-                return state
+                return state.mutate {
+                    $0.isLoading = false
+                    return
+                }
             }
         case .loadMoreItems:
             return state.mutate {
-                $0.shouldLoadNextPage = true
+                $0.shouldLoadNextPage = false
                 $0.page += 1
+                $0.isLoading = true
             }
-        case .pullToRequest:
-            return state.mutate{
-                $0.movies = Version([])
-                $0.isPullRefreshing = true
-                $0.page = 1
+        case .pullToRequest(let movieResponse):
+            switch movieResponse {
+            case .success(let movies):
+                return state.mutate {
+                    $0.movies = Version(movies)
+                    $0.isLoading = false
+                    return
+                }
+            case .failure(_):
+                return state.mutate {
+                    $0.isLoading = false
+                    return
+                }
             }
+
         }
     }
 }
@@ -64,21 +81,28 @@ func loadMovieState(
     pullToRequestTrigger: @escaping () -> Observable<()>
     ) -> Observable<MovieState> {
     
-    let searchPerformerFeedback: ( (ObservableSchedulerContext<MovieState>) ) -> Observable<MovieCommand> = { state in
-        return state.map{ ($0.page , $0.shouldLoadNextPage , $0.isPullRefreshing) }
-            .distinctUntilChanged { $0 == $1 }
-            .flatMap({ (page, shouldLoadNextPage,shoulPullToRequest) -> Observable<MovieCommand> in
-                return NetworkingLayer.fetchRepositories(page: page)
+    let loadMoviePerformerFeedback: ( (ObservableSchedulerContext<MovieState>) ) -> Observable<MovieCommand> = { state in
+        let activityIndicator = ActivityIndicator()
+        return state.map{ ($0.page , $0.shouldLoadNextPage ) }
+            .distinctUntilChanged { $0 == $1 } // Refesh network when state change . $0 == $1 Implement == function on what field
+            .flatMap({ (page, shouldLoadNextPage) -> Observable<MovieCommand> in
+                return NetworkingLayer.fetchRepositories(page: page).trackActivity(activityIndicator)
                 .asObservable()
+                .shareReplay(1)
                 .map(MovieCommand.movieResponseRecieved)
-            }).shareReplay(1)
+            })
     }
     
     // this is degenerated feedback loop that doesn't depend on output state
     let inputFeedbackLoop: (ObservableSchedulerContext<MovieState>) -> Observable<MovieCommand> = { stateContext in
         let loadNextPage =  loadNextPageTrigger(stateContext.source).map{ _ in MovieCommand.loadMoreItems }
-        let pullToRequest = pullToRequestTrigger().map{ MovieCommand.pullToRequest }
-        return Observable.merge(loadNextPage,pullToRequest)
+        let pullToRefesh = pullToRequestTrigger().flatMap({ () -> Observable<MovieCommand> in
+            return  NetworkingLayer.fetchRepositories()
+                .asObservable()
+                .shareReplay(1)
+                .map(MovieCommand.pullToRequest)
+        })
+        return Observable.merge(loadNextPage, pullToRefesh).shareReplay(1)
     }
     
     return  Observable.system(
@@ -90,7 +114,7 @@ func loadMovieState(
         scheduler: MainScheduler.instance,
         // list of feedbacks (command generators)
         scheduledFeedback: [
-            searchPerformerFeedback,
+            loadMoviePerformerFeedback,
             inputFeedbackLoop
         ]
     )
@@ -101,7 +125,5 @@ func loadMovieState(
 func ==(lhs: MovieState, rhs: MovieState) -> Bool {
     return lhs.shouldLoadNextPage == rhs.shouldLoadNextPage
     && lhs.page == rhs.page
-    && lhs.isPullRefreshing == rhs.isPullRefreshing
-    
-    
 }
+
