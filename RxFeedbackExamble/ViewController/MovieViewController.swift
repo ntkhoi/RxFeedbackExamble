@@ -12,13 +12,22 @@ import RxCocoa
 import RxDataSources
 import SVProgressHUD
 
-extension UIScrollView {
-    func  isNearBottomEdge(edgeOffset: CGFloat = 20.0) -> Bool {
-        return self.contentOffset.y + self.frame.size.height + edgeOffset > self.contentSize.height
+extension Reactive where Base: UITableView {
+    var nearBottom: Driver<()> {
+        func isNearBottomEdge(tableView: UITableView, edgeOffset: CGFloat = 20.0) -> Bool {
+            return tableView.contentOffset.y + tableView.frame.size.height + edgeOffset > tableView.contentSize.height
+        }
+        return self.contentOffset.asDriver()
+            .flatMap { _ in
+                return isNearBottomEdge(tableView: self.base, edgeOffset: 20.0)
+                    ? Driver.just(())
+                    : Driver.empty()
+        }
     }
 }
 
-class ViewController: UIViewController, UITableViewDelegate  {
+
+class MovieViewController: UIViewController, UITableViewDelegate  {
 
     private var disposeBag = DisposeBag()
     private var refeshcontrol: UIRefreshControl?
@@ -43,14 +52,15 @@ class ViewController: UIViewController, UITableViewDelegate  {
         //----------------------------------------------------------------//
 
         let loadNextPageTrigger: (Observable<MovieState>) -> Observable<()> =  { state in
-            tableView.rx.contentOffset.asObservable()
-                .withLatestFrom(state)
-                .flatMap { state in
-                    return tableView.isNearBottomEdge(edgeOffset: 20.0) && !state.shouldLoadNextPage
-                        ? Observable.just(())
-                        : Observable.empty()
-            }
+            return state.flatMapLatest({ (state) -> Observable<()> in
+                if state.shouldLoadNextPage {
+                    return Observable.empty()
+                }
+                return tableView.rx.nearBottom.asObservable()
+            })
         }
+        
+        
         
         let pullToRequestTrigger: () -> Observable<()> = { [unowned self]  in
             self.refeshcontrol!.rx.controlEvent(.valueChanged).asObservable()

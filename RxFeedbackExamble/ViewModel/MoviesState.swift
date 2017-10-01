@@ -55,7 +55,7 @@ extension MovieState {
                 return state.mutate {
                     $0.movies = Version(movies)
                     $0.page = 1
-                    $0.isLoading = false // Not work . Because can not change state in the schedule feedback
+                    $0.isLoading = false
                     return
                 }
             case .failure(_):
@@ -85,9 +85,9 @@ func loadMovieState(
     
     let loadMoviePerformerFeedback: ( (ObservableSchedulerContext<MovieState>) ) -> Observable<MovieCommand> = { state in
         let activityIndicator = ActivityIndicator()
-        
-        return state.map{ ($0.page , $0.shouldLoadNextPage ) }
-            
+        return
+            state
+            .map{ ($0.page , $0.shouldLoadNextPage ) }
             .distinctUntilChanged { $0 == $1 } // Refesh network when state change . $0 == $1 Implement == function on what field
             .flatMapLatest({ (page, shouldLoadNextPage) -> Observable<MovieCommand> in
                 if !shouldLoadNextPage {
@@ -104,13 +104,15 @@ func loadMovieState(
     let inputFeedbackLoop: (ObservableSchedulerContext<MovieState>) -> Observable<MovieCommand> = { stateContext in
         let loadNextPage =  loadNextPageTrigger(stateContext.source).map{ _ in MovieCommand.loadMoreItems }
         let pullToRefesh = pullToRequestTrigger().flatMap({ () -> Observable<MovieCommand> in
-            return  NetworkingLayer.fetchRepositories()
+            return  NetworkingLayer.fetchRepositories() // Net set state.isloading = true to starting loading . But still don't know to modify state here because state is immutable
                 .asObservable()
                 .shareReplay(1)
                 .map(MovieCommand.pullToRequest)
         })
         return Observable.merge(loadNextPage, pullToRefesh).shareReplay(1)
     }
+    
+    
     
     return  Observable.system(
         // the initial state of our state machine

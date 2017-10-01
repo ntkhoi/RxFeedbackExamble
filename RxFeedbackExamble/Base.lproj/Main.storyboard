@@ -4,6 +4,7 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -13,7 +14,7 @@
         <!--Top Movies-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController automaticallyAdjustsScrollViewInsets="NO" id="BYZ-38-t0r" customClass="ViewController" customModule="RxFeedbackExamble" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController automaticallyAdjustsScrollViewInsets="NO" id="BYZ-38-t0r" customClass="MovieViewController" customModule="RxFeedbackExamble" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -30,7 +31,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="WhatsNewSwift4-feature-1" translatesAutoresizingMaskIntoConstraints="NO" id="mw8-JL-lZU">
-                                                    <rect key="frame" x="10" y="8" width="100" height="500.5"/>
+                                                    <rect key="frame" x="10" y="8" width="100" height="120"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="120" id="EKG-JQ-deK"/>
                                                         <constraint firstAttribute="width" constant="100" id="mFm-TT-Qa9"/>
@@ -52,7 +53,7 @@
                                             <constraints>
                                                 <constraint firstItem="mw8-JL-lZU" firstAttribute="top" secondItem="11u-0E-HlW" secondAttribute="top" id="1hl-eI-Zlu"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="F0J-Yy-0oS" secondAttribute="trailing" constant="5" id="6b0-zo-BYr"/>
-                                                <constraint firstAttribute="bottomMargin" secondItem="mw8-JL-lZU" secondAttribute="bottom" constant="8.5" id="9Ol-ix-wNb"/>
+                                                <constraint firstAttribute="bottomMargin" relation="greaterThanOrEqual" secondItem="mw8-JL-lZU" secondAttribute="bottom" constant="8.5" id="9Ol-ix-wNb"/>
                                                 <constraint firstItem="mw8-JL-lZU" firstAttribute="leading" secondItem="ngI-mo-Zv2" secondAttribute="leadingMargin" constant="2" id="RE5-1r-q9B"/>
                                                 <constraint firstItem="F0J-Yy-0oS" firstAttribute="top" secondItem="11u-0E-HlW" secondAttribute="bottom" constant="8" symbolic="YES" id="Rzs-jJ-Zm7"/>
                                                 <constraint firstItem="11u-0E-HlW" firstAttribute="leading" secondItem="F0J-Yy-0oS" secondAttribute="leading" id="SYx-qb-Zs0"/>
