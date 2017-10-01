@@ -93,7 +93,7 @@ func loadMovieState(
                 if !shouldLoadNextPage {
                     return Observable.empty()
                 }
-                return NetworkingLayer.fetchRepositories(page: page).trackActivity(activityIndicator)
+                return NetworkingLayer.fetchMovies(page: page).trackActivity(activityIndicator)
                 .asObservable()
                 .shareReplay(1)
                 .map(MovieCommand.movieResponseRecieved)
@@ -104,7 +104,7 @@ func loadMovieState(
     let inputFeedbackLoop: (ObservableSchedulerContext<MovieState>) -> Observable<MovieCommand> = { stateContext in
         let loadNextPage =  loadNextPageTrigger(stateContext.source).map{ _ in MovieCommand.loadMoreItems }
         let pullToRefesh = pullToRequestTrigger().flatMap({ () -> Observable<MovieCommand> in
-            return  NetworkingLayer.fetchRepositories() // Net set state.isloading = true to starting loading . But still don't know to modify state here because state is immutable
+            return  NetworkingLayer.fetchMovies() // Net set state.isloading = true to starting loading . But still don't know to modify state here because state is immutable
                 .asObservable()
                 .shareReplay(1)
                 .map(MovieCommand.pullToRequest)

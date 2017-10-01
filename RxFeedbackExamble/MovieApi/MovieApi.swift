@@ -23,9 +23,9 @@ typealias JsonObject = [String: Any]
 typealias MovieResponse = Driver<Result<[Movie]>>
 
 
-
+// TODO : Separate Network, parse result to purse function .
 struct NetworkingLayer {
-    static func fetchRepositories(page: Int = 1) -> MovieResponse {
+    static func fetchMovies(page: Int = 1) -> MovieResponse {
         return requestJSON(.get, "https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed&page=\(page)").debug()
             .observeOn(ConcurrentDispatchQueueScheduler(qos: .background))
             .map { (response, json) -> Result<[Movie]> in
@@ -36,7 +36,6 @@ struct NetworkingLayer {
                     guard let moviesJson = json["results"] as? [JsonObject] else {
                         return .failure(CommonError.parsingError)
                     }
-                    
                     if let movies = Mapper<Movie>().mapArray(JSONObject: moviesJson){
                         return .success(movies)
                     } else {

@@ -74,7 +74,15 @@ class MovieViewController: UIViewController, UITableViewDelegate  {
         configCell()
         configDatasource()
         bindingIsRefeshing()
-        
+
+        tableView.rx.modelSelected(Movie.self)
+            .subscribe(onNext: { movie in
+                print("Movie")
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    fileprivate func bindingLoading() {
         _state!.map{ $0.isLoading }
             .subscribe(onNext: { (isloading) in
                 if isloading {
@@ -84,14 +92,9 @@ class MovieViewController: UIViewController, UITableViewDelegate  {
                 }
             }).addDisposableTo(disposeBag)
         
-        
-        tableView.rx.modelSelected(Movie.self)
-            .subscribe(onNext: { movie in
-                print("Movie")
-            })
-            .disposed(by: disposeBag)
     }
     
+
     fileprivate func configCell() {
         dataSource.configureCell = { (_, tv, ip, movie: Movie) in
             let cell = tv.dequeueReusableCell(withIdentifier: String(describing: MovieCell.self))! as! MovieCell
