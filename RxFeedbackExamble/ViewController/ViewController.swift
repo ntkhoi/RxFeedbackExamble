@@ -53,10 +53,9 @@ class ViewController: UIViewController, UITableViewDelegate  {
         }
         
         let pullToRequestTrigger: () -> Observable<()> = { [unowned self]  in
-            self.refeshcontrol!.rx.controlEvent(.valueChanged)
-            .asObservable()
+            self.refeshcontrol!.rx.controlEvent(.valueChanged).asObservable()
         }
-        
+    
         _state = loadMovieState(
             loadNextPageTrigger: loadNextPageTrigger ,
             pullToRequestTrigger: pullToRequestTrigger

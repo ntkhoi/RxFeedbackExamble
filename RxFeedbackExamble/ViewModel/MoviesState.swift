@@ -19,6 +19,7 @@ struct MovieState {
         shouldLoadNextPage = true
         isPullRefreshing = false
         isLoading = true
+        
     }
 }
 extension MovieState {
@@ -31,7 +32,7 @@ extension MovieState {
             case .success(let movies):
                 return state.mutate {
                     $0.movies = Version(state.movies.value + movies )
-                    $0.shouldLoadNextPage = true
+                    $0.shouldLoadNextPage = false
                     $0.isPullRefreshing = false
                     $0.isLoading = false
                     return
@@ -44,7 +45,7 @@ extension MovieState {
             }
         case .loadMoreItems:
             return state.mutate {
-                $0.shouldLoadNextPage = false
+                $0.shouldLoadNextPage = true
                 $0.page += 1
                 $0.isLoading = true
             }
@@ -53,7 +54,8 @@ extension MovieState {
             case .success(let movies):
                 return state.mutate {
                     $0.movies = Version(movies)
-                    $0.isLoading = false
+                    $0.page = 1
+                    $0.isLoading = false // Not work . Because can not change state in the schedule feedback
                     return
                 }
             case .failure(_):
@@ -83,9 +85,14 @@ func loadMovieState(
     
     let loadMoviePerformerFeedback: ( (ObservableSchedulerContext<MovieState>) ) -> Observable<MovieCommand> = { state in
         let activityIndicator = ActivityIndicator()
+        
         return state.map{ ($0.page , $0.shouldLoadNextPage ) }
+            
             .distinctUntilChanged { $0 == $1 } // Refesh network when state change . $0 == $1 Implement == function on what field
-            .flatMap({ (page, shouldLoadNextPage) -> Observable<MovieCommand> in
+            .flatMapLatest({ (page, shouldLoadNextPage) -> Observable<MovieCommand> in
+                if !shouldLoadNextPage {
+                    return Observable.empty()
+                }
                 return NetworkingLayer.fetchRepositories(page: page).trackActivity(activityIndicator)
                 .asObservable()
                 .shareReplay(1)
@@ -124,6 +131,5 @@ func loadMovieState(
 // Implement `Equatable` for `distinctUntilChanged()` to work
 func ==(lhs: MovieState, rhs: MovieState) -> Bool {
     return lhs.shouldLoadNextPage == rhs.shouldLoadNextPage
-    && lhs.page == rhs.page
 }
 
