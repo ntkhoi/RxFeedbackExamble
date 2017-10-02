@@ -11,6 +11,7 @@ import RxSwift
 import RxCocoa
 import RxDataSources
 import SVProgressHUD
+import RxSegue
 
 extension Reactive where Base: UITableView {
     var nearBottom: Driver<()> {
@@ -48,9 +49,8 @@ class MovieViewController: UIViewController, UITableViewDelegate  {
         let tableView: UITableView = self.tableView
         refeshcontrol = UIRefreshControl()
         tableView.insertSubview(refeshcontrol!, at: 0)
-        
         //----------------------------------------------------------------//
-
+        
         let loadNextPageTrigger: (Observable<MovieState>) -> Observable<()> =  { state in
             return state.flatMapLatest({ (state) -> Observable<()> in
                 if state.shouldLoadNextPage {
@@ -59,9 +59,7 @@ class MovieViewController: UIViewController, UITableViewDelegate  {
                 return tableView.rx.nearBottom.asObservable()
             })
         }
-        
-        
-        
+ 
         let pullToRequestTrigger: () -> Observable<()> = { [unowned self]  in
             self.refeshcontrol!.rx.controlEvent(.valueChanged).asObservable()
         }
@@ -75,11 +73,7 @@ class MovieViewController: UIViewController, UITableViewDelegate  {
         configDatasource()
         bindingIsRefeshing()
 
-        tableView.rx.modelSelected(Movie.self)
-            .subscribe(onNext: { movie in
-                print("Movie")
-            })
-            .disposed(by: disposeBag)
+    
     }
     
     fileprivate func bindingLoading() {
@@ -94,7 +88,6 @@ class MovieViewController: UIViewController, UITableViewDelegate  {
         
     }
     
-
     fileprivate func configCell() {
         dataSource.configureCell = { (_, tv, ip, movie: Movie) in
             let cell = tv.dequeueReusableCell(withIdentifier: String(describing: MovieCell.self))! as! MovieCell
@@ -118,3 +111,10 @@ class MovieViewController: UIViewController, UITableViewDelegate  {
             .addDisposableTo(disposeBag)
     }
 }
+//
+//tableView.rx.modelSelected(Movie.self)
+//    .subscribe(onNext: { movie in
+//        print("Movie")
+//    })
+//    .disposed(by: disposeBag)
+

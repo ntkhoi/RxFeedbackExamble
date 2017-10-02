@@ -135,3 +135,8 @@ func ==(lhs: MovieState, rhs: MovieState) -> Bool {
     return lhs.shouldLoadNextPage == rhs.shouldLoadNextPage
 }
 
+
+
+
+
+
